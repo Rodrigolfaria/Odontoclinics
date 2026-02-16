@@ -11,4 +11,4 @@
 <script src="<?php echo $base_path; ?>js/settings.js"></script>
 <script src="<?php echo $base_path; ?>js/todolist.js"></script>
 <script src="<?php echo $base_path; ?>js/jquery.cookie.js"></script>
-<script src="<?php echo $base_path; ?>js/dashboard.js"></script>
+<!-- <script src="<?php echo $base_path; ?>js/dashboard.js"></script> -->
