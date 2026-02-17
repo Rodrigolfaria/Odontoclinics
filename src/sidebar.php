@@ -1,14 +1,24 @@
 <?php
-// 1. Configuração do caminho base para LINKS (HTML/Navegador)
 $path = "http://localhost:8888/odontoclinics/src/";
-$nome_dentista = "Dra. Priscilla"; 
 
-// 2. Lógica para detectar onde o arquivo está e ajustar o caminho do PHP (Sistema de Arquivos)
-// Se o arquivo atual estiver em uma subpasta (contém 'pages'), precisamos voltar níveis
+// Caminho absoluto para conexão
+include $_SERVER['DOCUMENT_ROOT'] . '/odontoclinics/src/conexao.php';
+
+// Buscar dados da clínica (PDO)
+$stmt = $conn->prepare("SELECT * FROM configuracao_clinica WHERE id = 1");
+$stmt->execute();
+$config = $stmt->fetch(PDO::FETCH_ASSOC) ?? [];
+
+// Variáveis dinâmicas
+$nome_dentista = $config['nome_dentista'] ?? "Dentista";
+$nome_clinica  = $config['nome_clinica'] ?? "Clínica";
+$logo_clinica  = $config['logo'] ?? ($path . "assets/images/logo.png");
+
+// Detectar diretório atual
 $diretorio_atual = dirname($_SERVER['PHP_SELF']);
 $prefixo_php = (strpos($diretorio_atual, 'pages') !== false) ? "../../" : "";
 
-// Lógica de Ativação de Menus
+// Lógica de ativação de menus
 $pagina_atual = basename($_SERVER['PHP_SELF']);
 $menu_consultas_ativo = (
     $pagina_atual == 'agendar-consulta.php' || 
@@ -21,15 +31,18 @@ $menu_pacientes_ativo = ($pagina_atual == 'cadastrar-paciente.php' || $pagina_at
 $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atual == 'fluxo-caixa.php');
 ?>
 
+
+
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
     <a class="navbar-brand brand-logo" href="<?php echo $path; ?>index.php">
-        <img src="<?php echo $path; ?>assets/images/logo.png" alt="logo" style="width: 160px; height: auto;" />
+        <img src="<?php echo $logo_clinica; ?>" alt="logo" style="width: 160px; height: auto;" />
     </a>
     <a class="navbar-brand brand-logo-mini" href="<?php echo $path; ?>index.php">
-        <img src="<?php echo $path; ?>assets/images/logo.png" alt="logo" />
+        <img src="<?php echo $logo_clinica; ?>" alt="logo" />
     </a>
   </div>
+
   <div class="navbar-menu-wrapper d-flex align-items-stretch">
     <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
       <span class="mdi mdi-menu"></span>
@@ -55,6 +68,7 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
         </div>
       </li>
     </ul>
+
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
       <span class="mdi mdi-menu"></span>
     </button>
@@ -65,6 +79,8 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
   
   <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
+
+      <!-- PERFIL DO DENTISTA -->
       <li class="nav-item nav-profile">
         <a href="#" class="nav-link">
           <div class="nav-profile-image">
@@ -73,12 +89,13 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
           </div>
           <div class="nav-profile-text d-flex flex-column">
             <span class="font-weight-bold mb-2"><?php echo $nome_dentista; ?></span>
-            <span class="text-secondary text-small">Cirurgião Dentista</span>
+            <span class="text-secondary text-small"><?php echo $nome_clinica; ?></span>
           </div>
           <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
         </a>
       </li>
-      
+
+      <!-- DASHBOARD -->
       <li class="nav-item <?php echo ($pagina_atual == 'index.php') ? 'active' : ''; ?>">
         <a class="nav-link" href="<?php echo $path; ?>index.php">
           <span class="menu-title">Dashboard</span>
@@ -86,6 +103,7 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
         </a>
       </li>
 
+      <!-- PACIENTES -->
       <li class="nav-item <?php echo ($menu_pacientes_ativo) ? 'active' : ''; ?>">
         <a class="nav-link" data-bs-toggle="collapse" href="#ui-pacientes" aria-expanded="<?php echo ($menu_pacientes_ativo) ? 'true' : 'false'; ?>" aria-controls="ui-pacientes">
           <span class="menu-title">Pacientes</span>
@@ -104,6 +122,7 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
         </div>
       </li>
 
+      <!-- CONSULTAS -->
       <li class="nav-item <?php echo ($menu_consultas_ativo) ? 'active' : ''; ?>">
         <a class="nav-link" data-bs-toggle="collapse" href="#ui-consultas" aria-expanded="<?php echo ($menu_consultas_ativo) ? 'true' : 'false'; ?>" aria-controls="ui-consultas">
           <span class="menu-title">Consultas</span>
@@ -120,6 +139,7 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
         </div>
       </li>
 
+      <!-- AGENDA VISUAL -->
       <li class="nav-item <?php echo ($pagina_atual == 'agenda.php') ? 'active' : ''; ?>">
         <a class="nav-link" href="<?php echo $path; ?>pages/forms/agenda.php">
           <span class="menu-title">Agenda Visual</span>
@@ -127,6 +147,7 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
         </a>
       </li>
 
+      <!-- FINANCEIRO -->
       <li class="nav-item <?php echo ($menu_financeiro_ativo) ? 'active' : ''; ?>">
         <a class="nav-link" data-bs-toggle="collapse" href="#ui-financeiro" aria-expanded="<?php echo ($menu_financeiro_ativo) ? 'true' : 'false'; ?>" aria-controls="ui-financeiro">
           <span class="menu-title">Financeiro</span>
@@ -144,5 +165,14 @@ $menu_financeiro_ativo = ($pagina_atual == 'novo-lancamento.php' || $pagina_atua
           </ul>
         </div>
       </li>
+
+      <!-- 🔥 CONFIGURAÇÃO DA CLÍNICA -->
+      <li class="nav-item">
+        <a class="nav-link" href="<?php echo $path; ?>pages/forms/configuracao-clinica.php">
+          <span class="menu-title">Configuração da Clínica</span>
+          <i class="mdi mdi-hospital-building menu-icon"></i>
+        </a>
+      </li>
+
     </ul>
   </nav>
